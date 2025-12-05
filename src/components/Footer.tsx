@@ -74,9 +74,6 @@ export const Footer = () => {
         {/* Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <p>© {currentYear} Educational Tour Portfolio. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Made with <Heart size={14} className="text-gold fill-gold" /> in the Philippines
-          </p>
         </div>
       </div>
     </footer>
