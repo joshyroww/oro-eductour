@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import { Award, Download, ExternalLink } from "lucide-react";
+import { useRef, useState } from "react";
+import { Award, X, ZoomIn } from "lucide-react";
+import certificateCompletion from "@/assets/certificates/certificate-completion.jpg";
 
 interface Certificate {
   id: number;
@@ -8,47 +9,21 @@ interface Certificate {
   issuer: string;
   date: string;
   description: string;
+  image: string;
 }
 
 const certificates: Certificate[] = [
   {
     id: 1,
-    title: "Certificate of Participation",
-    issuer: "WorldTech Information Solutions, Inc.",
-    date: "Day 1",
-    description: "IT Consultancy & Cybersecurity Workshop",
-  },
-  {
-    id: 2,
     title: "Certificate of Completion",
-    issuer: "CodeChum",
-    date: "Day 2",
-    description: "Educational Technology Platform Orientation",
-  },
-  {
-    id: 3,
-    title: "Certificate of Attendance",
-    issuer: "RIVAN IT CEBU",
-    date: "Day 2",
-    description: "IT & Networking Training Overview",
-  },
-  {
-    id: 4,
-    title: "Certificate of Participation",
-    issuer: "MATA Technologies, Inc.",
-    date: "Day 3",
-    description: "Virtual Reality Technology Demonstration",
-  },
-  {
-    id: 5,
-    title: "Certificate of Recognition",
-    issuer: "TARSIER 117",
-    date: "Day 4",
-    description: "Emergency Response Systems Briefing",
+    issuer: "World of Adventures Travel and Tours",
+    date: "November 22, 2025",
+    description: "Educational Tour in Cebu and Bohol - Awarded for active participation, sincere effort, and meaningful attendance",
+    image: certificateCompletion,
   },
 ];
 
-const CertificateCard = ({ cert, index }: { cert: Certificate; index: number }) => {
+const CertificateCard = ({ cert, index, onView }: { cert: Certificate; index: number; onView: (cert: Certificate) => void }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
@@ -58,36 +33,31 @@ const CertificateCard = ({ cert, index }: { cert: Certificate; index: number }) 
       initial={{ opacity: 0, y: 40, rotateX: -10 }}
       animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group"
+      className="group cursor-pointer"
+      onClick={() => onView(cert)}
     >
       <div className="relative bg-card rounded-2xl border border-border/50 overflow-hidden transition-all duration-500 hover:border-gold/40 hover:shadow-xl hover:shadow-gold/10">
-        {/* Certificate Visual */}
-        <div className="relative aspect-[4/3] bg-gradient-to-br from-secondary via-muted to-secondary flex items-center justify-center p-8">
-          {/* Decorative Border */}
-          <div className="absolute inset-4 border-2 border-gold/20 rounded-lg" />
-          <div className="absolute inset-6 border border-gold/10 rounded-lg" />
+        {/* Certificate Image */}
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <img
+            src={cert.image}
+            alt={cert.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
           
-          {/* Certificate Content Preview */}
-          <div className="text-center z-10">
-            <Award className="w-12 h-12 text-gold mx-auto mb-4" />
-            <h4 className="font-serif text-xl text-foreground mb-1">{cert.title}</h4>
-            <p className="text-sm text-muted-foreground">{cert.issuer}</p>
-          </div>
-
           {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4">
-            <button className="p-3 rounded-full bg-gold text-primary-foreground hover:scale-110 transition-transform">
-              <Download size={20} />
-            </button>
-            <button className="p-3 rounded-full bg-secondary text-foreground hover:scale-110 transition-transform">
-              <ExternalLink size={20} />
-            </button>
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+            <div className="flex items-center gap-2 text-gold">
+              <ZoomIn size={24} />
+              <span className="font-sans">View Certificate</span>
+            </div>
           </div>
         </div>
 
         {/* Info */}
         <div className="p-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <Award className="w-4 h-4 text-gold" />
             <span className="text-xs font-sans tracking-wider uppercase text-gold">
               {cert.date}
             </span>
@@ -103,6 +73,7 @@ const CertificateCard = ({ cert, index }: { cert: Certificate; index: number }) 
 export const CertificatesSection = () => {
   const headerRef = useRef(null);
   const isHeaderInView = useInView(headerRef, { once: true });
+  const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
 
   return (
     <section id="certificates" className="section-padding bg-charcoal-light">
@@ -119,33 +90,56 @@ export const CertificatesSection = () => {
             Achievements
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-foreground mb-6">
-            Certificates Earned
+            Certificate of Completion
           </h2>
           <p className="font-sans text-muted-foreground max-w-2xl mx-auto">
-            Recognition and certifications obtained from each company visited 
-            during our educational tour.
+            Official recognition for successfully completing the Cebu-Bohol Educational Tour, 
+            awarded by World of Adventures Travel and Tours (WATT).
           </p>
         </motion.div>
 
         {/* Certificates Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {certificates.map((cert, index) => (
-            <CertificateCard key={cert.id} cert={cert} index={index} />
-          ))}
+        <div className="flex justify-center">
+          <div className="max-w-lg w-full">
+            {certificates.map((cert, index) => (
+              <CertificateCard key={cert.id} cert={cert} index={index} onView={setSelectedCert} />
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Note */}
+      {/* Lightbox */}
+      {selectedCert && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 text-center"
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-background/95 backdrop-blur-lg flex items-center justify-center p-4"
         >
-          <p className="text-sm text-muted-foreground italic">
-            Click on certificates to download or view full versions. Replace placeholders with actual certificates.
-          </p>
+          <button
+            onClick={() => setSelectedCert(null)}
+            className="absolute top-6 right-6 p-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X size={24} />
+          </button>
+
+          <div className="max-w-5xl max-h-[90vh] overflow-hidden">
+            <img
+              src={selectedCert.image}
+              alt={selectedCert.title}
+              className="w-full h-full object-contain rounded-lg"
+            />
+            <div className="text-center mt-4">
+              <h3 className="font-serif text-xl text-foreground">
+                {selectedCert.title}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {selectedCert.issuer} • {selectedCert.date}
+              </p>
+            </div>
+          </div>
         </motion.div>
-      </div>
+      )}
     </section>
   );
 };
